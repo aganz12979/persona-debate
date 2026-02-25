@@ -1,0 +1,1956 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Persona Debate</title>
+
+    <!-- Config scripts -->
+    <script src="config.js"></script>
+    <script src="config-keys.js"></script>
+
+    <style>
+      :root {
+        --color-bg: #0f172a;
+        --color-bg-elevated: #020617;
+        --color-surface: #020617;
+        --color-surface-alt: #020617;
+        --color-border-subtle: rgba(148, 163, 184, 0.25);
+        --color-border-strong: rgba(148, 163, 184, 0.5);
+        --color-primary: #6366f1;
+        --color-primary-soft: rgba(99, 102, 241, 0.15);
+        --color-primary-strong: rgba(99, 102, 241, 0.9);
+        --color-text: #e5e7eb;
+        --color-text-muted: #9ca3af;
+        --color-input-bg: rgba(15, 23, 42, 0.9);
+        --color-input-border: rgba(55, 65, 81, 0.9);
+        --shadow-soft: 0 18px 60px rgba(15, 23, 42, 0.9);
+        --radius-lg: 18px;
+        --radius-md: 14px;
+        --radius-full: 999px;
+        --persona-1: #f97316;
+        --persona-2: #22c55e;
+        --persona-3: #6366f1;
+        --persona-4: #ec4899;
+        --persona-5: #eab308;
+        --status-ready: #9ca3af;
+        --status-loading: #60a5fa;
+        --status-error: #f97373;
+        --status-success: #4ade80;
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
+          "Segoe UI", sans-serif;
+        color: var(--color-text);
+        background: radial-gradient(circle at top left, #1f2937 0, #020617 45%),
+          radial-gradient(circle at bottom right, #4b5563 0, #020617 55%);
+      }
+
+      .app-shell {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 24px 20px 32px;
+      }
+
+      header {
+        margin-bottom: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+      }
+
+      .title-block {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+      }
+
+      .app-title-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .logo-pill {
+        width: 40px;
+        height: 40px;
+        border-radius: 14px;
+        background: radial-gradient(circle at 30% 10%, #e5e7eb 0, #9ca3af 30%, transparent 60%),
+          radial-gradient(circle at 70% 90%, #4b5563 0, transparent 55%),
+          linear-gradient(135deg, #4f46e5, #22d3ee);
+        box-shadow: 0 14px 40px rgba(37, 99, 235, 0.45);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #0b1120;
+        font-weight: 700;
+        font-size: 18px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 24px;
+        letter-spacing: 0.03em;
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+      }
+
+      h1 span.highlight {
+        padding: 2px 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.7);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        font-size: 13px;
+        font-weight: 500;
+        color: var(--color-primary);
+      }
+
+      .subtitle {
+        margin: 0;
+        font-size: 14px;
+        color: var(--color-text-muted);
+      }
+
+      .header-meta {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        align-items: flex-end;
+      }
+
+      .badge {
+        padding: 4px 10px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.85);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--color-text-muted);
+      }
+
+      .badge strong {
+        color: var(--color-primary);
+      }
+
+      .status-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 9px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        font-size: 11px;
+        color: var(--color-text-muted);
+      }
+
+      .status-dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #22c55e;
+        box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.25);
+      }
+
+      main {
+        display: grid;
+        grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr);
+        gap: 18px;
+      }
+
+      .panel {
+        background: linear-gradient(
+          135deg,
+          rgba(15, 23, 42, 0.94),
+          rgba(15, 23, 42, 0.98)
+        );
+        border-radius: 22px;
+        padding: 18px 18px 16px;
+        box-shadow: var(--shadow-soft);
+        border: 1px solid rgba(148, 163, 184, 0.35);
+        backdrop-filter: blur(18px);
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 12px;
+      }
+
+      .panel-title {
+        font-size: 13px;
+        text-transform: uppercase;
+        letter-spacing: 0.11em;
+        color: var(--color-text-muted);
+      }
+
+      .panel-title span {
+        color: var(--color-primary);
+      }
+
+      .panel-subtitle {
+        font-size: 11px;
+        color: var(--color-text-muted);
+      }
+
+      .panel-meta {
+        font-size: 11px;
+        color: var(--color-text-muted);
+      }
+
+      .input-group {
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      label {
+        font-size: 12px;
+        color: var(--color-text-muted);
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      textarea,
+      input[type="text"] {
+        width: 100%;
+        border-radius: 14px;
+        border: 1px solid var(--color-input-border);
+        background: var(--color-input-bg);
+        color: var(--color-text);
+        font-size: 13px;
+        padding: 9px 11px;
+        resize: vertical;
+        min-height: 42px;
+        outline: none;
+        transition: border-color 0.18s ease, box-shadow 0.18s ease,
+          background-color 0.18s ease;
+      }
+
+      textarea::placeholder,
+      input::placeholder {
+        color: rgba(148, 163, 184, 0.6);
+      }
+
+      textarea:focus,
+      input[type="text"]:focus {
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 1px rgba(129, 140, 248, 0.6);
+        background: rgba(15, 23, 42, 0.98);
+      }
+
+      #idea {
+        min-height: 90px;
+      }
+
+      .personas-container {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+        margin-bottom: 12px;
+      }
+
+      .persona-card {
+        border-radius: 16px;
+        padding: 9px 10px 9px 11px;
+        background: radial-gradient(circle at top left, #111827 0, #020617 65%);
+        border: 1px solid rgba(31, 41, 55, 0.95);
+        box-shadow: 0 14px 36px rgba(15, 23, 42, 0.65);
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        position: relative;
+        overflow: hidden;
+        transition: transform 0.16s ease, box-shadow 0.16s ease,
+          border-color 0.16s ease, background 0.16s ease;
+      }
+
+      .persona-card::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        opacity: 0.08;
+        background: radial-gradient(circle at 0 0, #ffffff, transparent 55%);
+        pointer-events: none;
+      }
+
+      .persona-card:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 18px 40px rgba(15, 23, 42, 0.9);
+        border-color: rgba(55, 65, 81, 0.95);
+      }
+
+      .persona-accent {
+        position: absolute;
+        left: 0;
+        top: 0;
+        bottom: 0;
+        width: 4px;
+        border-radius: 4px 0 0 4px;
+        background: var(--persona-1);
+      }
+
+      .persona-card[data-persona="1"] .persona-accent {
+        background: var(--persona-1);
+      }
+      .persona-card[data-persona="2"] .persona-accent {
+        background: var(--persona-2);
+      }
+      .persona-card[data-persona="3"] .persona-accent {
+        background: var(--persona-3);
+      }
+      .persona-card[data-persona="4"] .persona-accent {
+        background: var(--persona-4);
+      }
+      .persona-card[data-persona="5"] .persona-accent {
+        background: var(--persona-5);
+      }
+
+      .persona-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+      }
+
+      .persona-label {
+        font-size: 11px;
+        text-transform: uppercase;
+        letter-spacing: 0.12em;
+        color: var(--color-text-muted);
+      }
+
+      .persona-chip {
+        font-size: 11px;
+        padding: 3px 8px;
+        border-radius: 999px;
+        border: 1px solid rgba(75, 85, 99, 0.9);
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--color-text-muted);
+      }
+
+      .persona-name-input {
+        font-size: 13px;
+        font-weight: 500;
+        padding: 5px 9px;
+        border-radius: 999px;
+      }
+
+      .persona-perspective {
+        min-height: 52px;
+        font-size: 12px;
+        padding: 7px 9px;
+      }
+
+      .controls-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 8px;
+      }
+
+      #generateBtn {
+        border: none;
+        border-radius: 999px;
+        padding: 9px 18px;
+        font-size: 13px;
+        font-weight: 500;
+        cursor: pointer;
+        background: linear-gradient(135deg, #4f46e5, #6366f1);
+        color: #e5e7eb;
+        box-shadow: 0 14px 34px rgba(79, 70, 229, 0.58);
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        transition: transform 0.12s ease, box-shadow 0.12s ease,
+          background 0.2s ease;
+        white-space: nowrap;
+      }
+
+      #generateBtn span.icon {
+        width: 18px;
+        height: 18px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.8);
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 11px;
+      }
+
+      #generateBtn-label {
+        display: inline-block;
+      }
+
+      .btn-spinner {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 2px solid rgba(191, 219, 254, 0.45);
+        border-top-color: #e5e7eb;
+        margin-left: 4px;
+        animation: spin 0.9s linear infinite;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: opacity 0.15s ease, transform 0.15s ease;
+      }
+
+      #generateBtn.is-loading .btn-spinner {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      #generateBtn.is-loading span.icon {
+        opacity: 0.25;
+      }
+
+      #generateBtn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 20px 40px rgba(79, 70, 229, 0.7);
+        background: linear-gradient(135deg, #6366f1, #4f46e5);
+      }
+
+      #generateBtn:active {
+        transform: translateY(0);
+        box-shadow: 0 10px 28px rgba(79, 70, 229, 0.6);
+      }
+
+      #status {
+        font-size: 12px;
+        color: var(--status-ready);
+        padding: 6px 9px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.9);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        min-width: 0;
+        text-align: right;
+        flex: 1;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      #status.status-ready {
+        color: var(--status-ready);
+      }
+      #status.status-loading {
+        color: var(--status-loading);
+      }
+      #status.status-error {
+        color: var(--status-error);
+      }
+      #status.status-success {
+        color: var(--status-success);
+      }
+
+      .status-wrapper {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        flex: 1;
+        justify-content: flex-end;
+        min-width: 0;
+      }
+
+      .status-spinner {
+        width: 14px;
+        height: 14px;
+        border-radius: 999px;
+        border: 2px solid rgba(148, 163, 184, 0.45);
+        border-top-color: rgba(96, 165, 250, 0.95);
+        animation: spin 0.9s linear infinite;
+        opacity: 0;
+        transform: scale(0.8);
+        transition: opacity 0.18s ease, transform 0.18s ease;
+      }
+
+      .status-spinner.visible {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      .status-retry {
+        margin-left: 8px;
+        padding: 4px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(248, 250, 252, 0.3);
+        background: rgba(15, 23, 42, 0.95);
+        color: var(--color-text-muted);
+        font-size: 11px;
+        cursor: pointer;
+        transition: background 0.15s ease, border-color 0.15s ease,
+          transform 0.12s ease, box-shadow 0.12s ease, color 0.15s ease;
+        white-space: nowrap;
+      }
+
+      .status-retry:hover {
+        background: rgba(15, 23, 42, 1);
+        border-color: rgba(248, 250, 252, 0.6);
+        color: #e5e7eb;
+        box-shadow: 0 8px 20px rgba(15, 23, 42, 0.85);
+        transform: translateY(-1px);
+      }
+
+      .status-retry.hidden {
+        display: none;
+      }
+
+      .status-details {
+        margin-top: 4px;
+        font-size: 11px;
+        color: var(--color-text-muted);
+        text-align: right;
+      }
+
+      .status-details-toggle {
+        border: none;
+        padding: 0;
+        background: none;
+        color: var(--color-text-muted);
+        font-size: 11px;
+        cursor: pointer;
+        text-decoration: underline;
+      }
+
+      .status-details-body {
+        margin-top: 4px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px dashed rgba(75, 85, 99, 0.9);
+        text-align: left;
+        max-height: 140px;
+        overflow: auto;
+        white-space: pre-wrap;
+        word-break: break-word;
+      }
+
+      .status-details-body.hidden {
+        display: none;
+      }
+
+      .output-column {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+
+      .output-body {
+        display: grid;
+        grid-template-rows: minmax(0, 1.4fr) minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .scroll-section {
+        border-radius: 16px;
+        background: radial-gradient(circle at top left, #020617 0, #020617 55%);
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        padding: 10px 11px;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .scroll-section-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        font-size: 12px;
+        color: var(--color-text-muted);
+      }
+
+      .scroll-inner {
+        margin-top: 4px;
+        padding-right: 4px;
+        overflow-y: auto;
+        max-height: 270px;
+      }
+
+      #conversation {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .bubble {
+        position: relative;
+        max-width: 100%;
+        border-radius: 14px;
+        padding: 9px 11px 8px;
+        background: rgba(15, 23, 42, 0.96);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        box-shadow: 0 14px 30px rgba(15, 23, 42, 0.8);
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        opacity: 0;
+        transform: translateY(4px);
+        animation: bubbleFadeIn 0.26s ease forwards;
+      }
+
+      .bubble-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 11px;
+        color: var(--color-text-muted);
+      }
+
+      .bubble-name {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .bubble-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 999px;
+        background: var(--persona-1);
+      }
+
+      .bubble[data-persona="1"] .bubble-dot {
+        background: var(--persona-1);
+      }
+      .bubble[data-persona="2"] .bubble-dot {
+        background: var(--persona-2);
+      }
+      .bubble[data-persona="3"] .bubble-dot {
+        background: var(--persona-3);
+      }
+      .bubble[data-persona="4"] .bubble-dot {
+        background: var(--persona-4);
+      }
+      .bubble[data-persona="5"] .bubble-dot {
+        background: var(--persona-5);
+      }
+
+      .bubble-body {
+        font-size: 13px;
+        line-height: 1.5;
+        color: #e5e7eb;
+      }
+
+      #summary {
+        font-size: 13px;
+        line-height: 1.5;
+        color: #e5e7eb;
+      }
+
+      #summary.placeholder {
+        color: var(--color-text-muted);
+        font-size: 12px;
+      }
+
+      /* History sidebar */
+      .history-panel {
+        margin-top: 4px;
+        border-radius: 18px;
+        background: radial-gradient(circle at top left, #020617 0, #020617 55%);
+        border: 1px solid rgba(55, 65, 81, 0.95);
+        padding: 10px 11px 9px;
+        box-shadow: 0 16px 40px rgba(15, 23, 42, 0.85);
+        transition: transform 0.16s ease, box-shadow 0.16s ease,
+          border-color 0.16s ease, background 0.16s ease;
+      }
+
+      .history-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 8px;
+        font-size: 12px;
+        color: var(--color-text-muted);
+      }
+
+      .history-toggle-label {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        cursor: pointer;
+        padding: 4px 8px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        font-size: 11px;
+      }
+
+      .history-toggle-label span.chevron {
+        transition: transform 0.18s ease;
+      }
+
+      #history-toggle {
+        display: none;
+      }
+
+      #history {
+        margin-top: 6px;
+        max-height: 140px;
+        overflow-y: auto;
+        font-size: 12px;
+        color: var(--color-text-muted);
+        border-radius: 12px;
+        border: 1px dashed rgba(55, 65, 81, 0.9);
+        padding: 8px 9px;
+        background: rgba(15, 23, 42, 0.9);
+      }
+
+      .history-item {
+        display: block;
+        width: 100%;
+        text-align: left;
+        margin: 0 0 4px;
+        padding: 4px 6px;
+        border-radius: 8px;
+        border: 1px solid rgba(55, 65, 81, 0.9);
+        background: rgba(15, 23, 42, 0.95);
+        color: inherit;
+        font-size: 11px;
+        cursor: pointer;
+        transition: background 0.14s ease, border-color 0.14s ease,
+          transform 0.12s ease, box-shadow 0.12s ease;
+      }
+
+      .history-item:hover {
+        background: rgba(15, 23, 42, 1);
+        border-color: rgba(99, 102, 241, 0.9);
+        box-shadow: 0 8px 18px rgba(15, 23, 42, 0.8);
+        transform: translateY(-1px);
+      }
+
+      .history-item-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 6px;
+      }
+
+      .history-item-idea {
+        flex: 1;
+        min-width: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .history-item-meta {
+        font-size: 10px;
+        color: var(--color-text-muted);
+      }
+
+      .history-badge-new {
+        margin-left: 6px;
+        padding: 1px 6px;
+        border-radius: 999px;
+        background: rgba(52, 211, 153, 0.15);
+        border: 1px solid rgba(16, 185, 129, 0.7);
+        color: #6ee7b7;
+        font-size: 9px;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+      }
+
+      #history.empty::before {
+        content: "No saved debates yet. They will appear here when you start generating.";
+        opacity: 0.8;
+      }
+
+      #history-toggle:not(:checked) ~ #history {
+        display: none;
+      }
+
+      #history-toggle:not(:checked) ~ .history-footer {
+        margin-top: 0;
+      }
+
+      #history-toggle:not(:checked) + .history-header .history-toggle-label span.chevron {
+        transform: rotate(-90deg);
+      }
+
+      .history-footer {
+        margin-top: 6px;
+        font-size: 10px;
+        color: var(--color-text-muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+      }
+
+      .pill {
+        padding: 2px 7px;
+        border-radius: 999px;
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(31, 41, 55, 0.9);
+        font-size: 10px;
+      }
+
+      footer {
+        margin-top: 18px;
+        font-size: 11px;
+        color: var(--color-text-muted);
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+      }
+
+      @media (max-width: 900px) {
+        header {
+          flex-direction: column;
+          align-items: flex-start;
+        }
+
+        .header-meta {
+          align-items: flex-start;
+        }
+
+        main {
+          grid-template-columns: minmax(0, 1fr);
+        }
+      }
+
+      @media (max-width: 600px) {
+        .personas-container {
+          grid-template-columns: minmax(0, 1fr);
+        }
+
+        .controls-row {
+          flex-direction: column;
+          align-items: stretch;
+        }
+
+        #status {
+          text-align: left;
+        }
+      }
+
+      .char-counter {
+        margin-top: 4px;
+        font-size: 11px;
+        color: var(--color-text-muted);
+        text-align: right;
+      }
+
+      @keyframes spin {
+        from {
+          transform: rotate(0deg);
+        }
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes bubbleFadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <header>
+        <div class="title-block">
+          <div class="app-title-row">
+            <div class="logo-pill">P</div>
+            <h1>
+              Persona Debate
+              <span class="highlight">Stress-test your product ideas</span>
+            </h1>
+          </div>
+          <p class="subtitle">
+            Capture your idea once, then let multiple personas battle-test it before you
+            ship.
+          </p>
+        </div>
+        <div class="header-meta">
+          <div class="badge">
+            Running on <strong id="model-label">GPT</strong>
+          </div>
+          <div class="status-chip">
+            <span class="status-dot"></span>
+            Session ready
+          </div>
+        </div>
+      </header>
+
+      <main>
+        <!-- Left: Input -->
+        <section class="panel" aria-label="Input section">
+          <div class="panel-header">
+            <div>
+              <div class="panel-title"><span>1.</span> Input</div>
+              <div class="panel-subtitle">
+                Describe your product and the voices you want in the room.
+              </div>
+            </div>
+          </div>
+
+          <div class="input-group">
+            <label for="idea">
+              Product idea
+              <span class="panel-meta">What are you planning to build?</span>
+            </label>
+            <textarea
+              id="idea"
+              placeholder="Describe your product idea..."
+            ></textarea>
+            <div id="ideaCounter" class="char-counter">0 characters</div>
+          </div>
+
+          <div class="input-group">
+            <label>
+              Personas
+              <span class="panel-meta">Tune each voice to reflect your audience.</span>
+            </label>
+            <div class="personas-container">
+              <article class="persona-card" data-persona="1">
+                <div class="persona-accent"></div>
+                <div class="persona-header">
+                  <span class="persona-label">Persona 1</span>
+                  <span class="persona-chip">Skeptic</span>
+                </div>
+                <input
+                  type="text"
+                  class="persona-name-input"
+                  value="Skeptical Engineer"
+                />
+                <textarea
+                  class="persona-perspective"
+                  placeholder="How would this engineer challenge the feasibility, architecture, and edge cases?"
+                ></textarea>
+              </article>
+
+              <article class="persona-card" data-persona="2">
+                <div class="persona-accent"></div>
+                <div class="persona-header">
+                  <span class="persona-label">Persona 2</span>
+                  <span class="persona-chip">Buyer</span>
+                </div>
+                <input
+                  type="text"
+                  class="persona-name-input"
+                  value="Budget-Conscious Buyer"
+                />
+                <textarea
+                  class="persona-perspective"
+                  placeholder="Which pricing, ROI and risk questions does this buyer obsess over?"
+                ></textarea>
+              </article>
+
+              <article class="persona-card" data-persona="3">
+                <div class="persona-accent"></div>
+                <div class="persona-header">
+                  <span class="persona-label">Persona 3</span>
+                  <span class="persona-chip">Power user</span>
+                </div>
+                <input
+                  type="text"
+                  class="persona-name-input"
+                  value="Power User"
+                />
+                <textarea
+                  class="persona-perspective"
+                  placeholder="What workflows, power features, and edge cases matter to this user?"
+                ></textarea>
+              </article>
+
+              <article class="persona-card" data-persona="4">
+                <div class="persona-accent"></div>
+                <div class="persona-header">
+                  <span class="persona-label">Persona 4</span>
+                  <span class="persona-chip">Beginner</span>
+                </div>
+                <input
+                  type="text"
+                  class="persona-name-input"
+                  value="First-Time User"
+                />
+                <textarea
+                  class="persona-perspective"
+                  placeholder="What will confuse, delight, or block someone seeing this for the first time?"
+                ></textarea>
+              </article>
+
+              <article class="persona-card" data-persona="5">
+                <div class="persona-accent"></div>
+                <div class="persona-header">
+                  <span class="persona-label">Persona 5</span>
+                  <span class="persona-chip">Sponsor</span>
+                </div>
+                <input
+                  type="text"
+                  class="persona-name-input"
+                  value="Executive Sponsor"
+                />
+                <textarea
+                  class="persona-perspective"
+                  placeholder="Which strategic bets, optics, and risks is this sponsor weighing?"
+                ></textarea>
+              </article>
+            </div>
+          </div>
+
+          <div class="controls-row">
+            <button id="generateBtn" type="button">
+              <span class="icon">▶</span>
+              <span id="generateBtn-label">Generate Debate</span>
+              <span class="btn-spinner" aria-hidden="true"></span>
+            </button>
+            <div class="status-wrapper">
+              <div
+                id="statusSpinner"
+                class="status-spinner"
+                aria-hidden="true"
+              ></div>
+              <div id="status" class="status-ready">Ready</div>
+              <button
+                id="retryBtn"
+                type="button"
+                class="status-retry hidden"
+              >
+                Retry
+              </button>
+            </div>
+          </div>
+          <div id="statusDetails" class="status-details"></div>
+        </section>
+
+        <!-- Right: Output & history -->
+        <section class="output-column" aria-label="Output section">
+          <section class="panel">
+            <div class="panel-header">
+              <div>
+                <div class="panel-title"><span>2.</span> Debate</div>
+                <div class="panel-subtitle">
+                  Track how each persona reacts to your idea.
+                </div>
+              </div>
+            </div>
+
+            <div class="output-body">
+              <div class="scroll-section" aria-label="Conversation">
+                <div class="scroll-section-header">
+                  <span>Conversation</span>
+                  <span class="pill">Persona bubbles</span>
+                </div>
+                <div class="scroll-inner">
+                  <div id="conversation"></div>
+                </div>
+              </div>
+
+              <div class="scroll-section" aria-label="Summary">
+                <div class="scroll-section-header">
+                  <span>Summary</span>
+                  <span class="pill">Key takeaways</span>
+                </div>
+                <div class="scroll-inner">
+                  <div id="summary" class="placeholder">
+                    Once you generate a debate, you will see a concise summary of
+                    alignment, risks, and next steps here.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="history-panel" aria-label="History sidebar">
+            <input type="checkbox" id="history-toggle" checked />
+            <div class="history-header">
+              <span>History</span>
+              <label class="history-toggle-label" for="history-toggle">
+                <span class="chevron">▾</span>
+                Saved debates
+              </label>
+            </div>
+            <div id="history" class="empty"></div>
+            <div class="history-footer">
+              <span class="pill">Saved locally</span>
+              <div style="display: flex; gap: 6px;">
+                <button id="clearHistoryBtn" type="button">Clear history</button>
+                <button id="resetAppBtn" type="button">Reset app</button>
+              </div>
+            </div>
+          </aside>
+        </section>
+      </main>
+
+      <footer>
+        <span>Persona Debate · privately prototypes conversations before they happen.</span>
+        <span>Config loaded from <code>config.js</code> &amp; <code>config-keys.js</code>.</span>
+      </footer>
+    </div>
+
+    <script>
+      function updateStatus(message, type) {
+        var statusEl = document.getElementById("status");
+        if (!statusEl) return;
+
+        statusEl.textContent = message || "";
+        statusEl.classList.remove(
+          "status-ready",
+          "status-loading",
+          "status-error",
+          "status-success"
+        );
+
+        switch (type) {
+          case "loading":
+            statusEl.classList.add("status-loading");
+            break;
+          case "error":
+            statusEl.classList.add("status-error");
+            break;
+          case "success":
+            statusEl.classList.add("status-success");
+            break;
+          case "ready":
+          default:
+            statusEl.classList.add("status-ready");
+            break;
+        }
+      }
+
+      function showError(message, details) {
+        updateStatus(message, "error");
+
+        var detailsContainer = document.getElementById("statusDetails");
+        var retryBtn = document.getElementById("retryBtn");
+
+        if (retryBtn) {
+          retryBtn.classList.remove("hidden");
+        }
+
+        if (detailsContainer) {
+          detailsContainer.innerHTML = "";
+
+          if (details) {
+            var toggle = document.createElement("button");
+            toggle.type = "button";
+            toggle.className = "status-details-toggle";
+            toggle.textContent = "Show details";
+
+            var body = document.createElement("div");
+            body.className = "status-details-body hidden";
+
+            var normalized;
+            try {
+              if (typeof details === "string") {
+                normalized = details;
+              } else {
+                normalized = JSON.stringify(details, null, 2);
+              }
+            } catch (_) {
+              normalized = String(details);
+            }
+
+            // Limit very large payloads
+            if (normalized.length > 4000) {
+              normalized = normalized.slice(0, 4000) + "\n…(truncated)";
+            }
+
+            body.textContent = normalized;
+
+            toggle.addEventListener("click", function () {
+              var isHidden = body.classList.contains("hidden");
+              body.classList.toggle("hidden", !isHidden);
+              toggle.textContent = isHidden ? "Hide details" : "Show details";
+            });
+
+            detailsContainer.appendChild(toggle);
+            detailsContainer.appendChild(body);
+          }
+        }
+
+        var now = new Date().toISOString();
+        console.error("PersonaDebate error", {
+          at: now,
+          message: message,
+          details: details,
+        });
+      }
+
+      function collectFormState() {
+        var ideaEl = document.getElementById("idea");
+        var personasNodes = document.querySelectorAll(".persona-card");
+
+        var idea = (ideaEl && ideaEl.value ? ideaEl.value : "").trim();
+        var personas = [];
+
+        personasNodes.forEach(function (card, index) {
+          var nameInput = card.querySelector(".persona-name-input");
+          var perspectiveInput = card.querySelector(".persona-perspective");
+          var name = nameInput && nameInput.value ? nameInput.value.trim() : "";
+          var perspective =
+            perspectiveInput && perspectiveInput.value
+              ? perspectiveInput.value.trim()
+              : "";
+
+          personas.push({
+            index: index,
+            name: name,
+            perspective: perspective,
+          });
+        });
+
+        return { idea: idea, personas: personas };
+      }
+
+      function buildDebatePrompt(idea, personas) {
+        var personasDescription = personas
+          .map(function (p, idx) {
+            return (
+              "- Persona " +
+              (idx + 1) +
+              ": " +
+              p.name +
+              (p.perspective
+                ? " (perspective: " + p.perspective + ")"
+                : " (perspective: define based on their title if missing)")
+            );
+          })
+          .join("\n");
+
+        var prompt =
+          "You are orchestrating a realistic, candid multi-persona debate about a product idea.\n\n" +
+          "Product idea:\n" +
+          idea +
+          "\n\n" +
+          "Personas (names and perspectives):\n" +
+          personasDescription +
+          "\n\n" +
+          "Task:\n" +
+          "- Generate a realistic 8–10 message debate among the 5 personas about the product idea.\n" +
+          "- Each persona should argue consistently from their defined perspective.\n" +
+          "- Include genuine disagreements, pushback, and contrasting viewpoints.\n" +
+          "- Let personas reference each other's points and build on or challenge them.\n" +
+          "- End with a synthesis of key tensions, the strongest objections, and potential insights.\n\n" +
+          "Output format (VERY IMPORTANT):\n" +
+          "Return a single JSON object with EXACTLY this structure and nothing else:\n" +
+          '{\n' +
+          '  "messages": [\n' +
+          '    { "persona": "string", "message": "string" }\n' +
+          "  ],\n" +
+          '  "summary": {\n' +
+          '    "tensions": ["string"],\n' +
+          '    "objections": ["string"],\n' +
+          '    "insights": ["string"]\n' +
+          "  }\n" +
+          "}\n\n" +
+          "Rules:\n" +
+          "- Respond with VALID JSON ONLY, no markdown, no explanations.\n" +
+          "- Do not include any keys other than messages and summary.\n" +
+          "- Ensure the JSON is parseable by a standard JSON parser.";
+
+        return prompt;
+      }
+
+      var personaColorMap = {};
+      var personaColorOrder = [];
+      var personaColors = [
+        "var(--persona-1)",
+        "var(--persona-2)",
+        "var(--persona-3)",
+        "var(--persona-4)",
+        "var(--persona-5)",
+      ];
+
+      function getPersonaColorIndex(personaName) {
+        var key = personaName || "";
+        if (personaColorMap.hasOwnProperty(key)) {
+          return personaColorMap[key];
+        }
+        var nextIndex = personaColorOrder.length % personaColors.length;
+        personaColorMap[key] = nextIndex;
+        personaColorOrder.push(key);
+        return nextIndex;
+      }
+
+      function displayDebate(data) {
+        var conversationEl = document.getElementById("conversation");
+        var summaryEl = document.getElementById("summary");
+
+        if (!conversationEl || !summaryEl) {
+          console.error("PersonaDebate displayDebate: missing DOM containers", {
+            conversationEl: !!conversationEl,
+            summaryEl: !!summaryEl,
+          });
+          return;
+        }
+
+        conversationEl.innerHTML = "";
+
+        if (!data || !Array.isArray(data.messages)) {
+          console.error("PersonaDebate displayDebate: invalid messages payload", {
+            data: data,
+          });
+          updateStatus("Unexpected AI response - see console", "error");
+          return;
+        }
+
+        data.messages.forEach(function (msg, idx) {
+          var personaName =
+            msg && typeof msg.persona === "string" && msg.persona.trim()
+              ? msg.persona.trim()
+              : "Persona " + (idx + 1);
+          var messageText =
+            msg && typeof msg.message === "string" ? msg.message : "";
+
+          var colorIndex = getPersonaColorIndex(personaName);
+          var colorVar = personaColors[colorIndex];
+
+          var bubble = document.createElement("div");
+          bubble.className = "bubble";
+          bubble.dataset.persona = String(colorIndex + 1);
+          bubble.style.borderColor = colorVar;
+
+          var header = document.createElement("div");
+          header.className = "bubble-header";
+
+          var nameWrap = document.createElement("div");
+          nameWrap.className = "bubble-name";
+
+          var dot = document.createElement("span");
+          dot.className = "bubble-dot";
+          dot.style.backgroundColor = colorVar;
+
+          var nameLabel = document.createElement("span");
+          nameLabel.textContent = personaName;
+
+          nameWrap.appendChild(dot);
+          nameWrap.appendChild(nameLabel);
+
+          var meta = document.createElement("span");
+          meta.textContent = "Turn " + (idx + 1);
+
+          header.appendChild(nameWrap);
+          header.appendChild(meta);
+
+          var body = document.createElement("div");
+          body.className = "bubble-body";
+          body.textContent = messageText;
+
+          bubble.appendChild(header);
+          bubble.appendChild(body);
+
+          conversationEl.appendChild(bubble);
+        });
+
+        summaryEl.classList.remove("placeholder");
+        summaryEl.innerHTML = "";
+
+        var summary = data.summary || {};
+        var sections = [
+          { key: "tensions", label: "Key tensions" },
+          { key: "objections", label: "Strongest objections" },
+          { key: "insights", label: "Potential insights" },
+        ];
+
+        sections.forEach(function (section) {
+          var items = Array.isArray(summary[section.key])
+            ? summary[section.key]
+            : [];
+
+          var hasItems = items.length > 0;
+          var sectionEl = document.createElement("div");
+          sectionEl.style.marginBottom = "8px";
+
+          var heading = document.createElement("div");
+          heading.style.fontSize = "12px";
+          heading.style.fontWeight = "600";
+          heading.style.color = "var(--color-text-muted)";
+          heading.textContent = section.label;
+
+          sectionEl.appendChild(heading);
+
+          if (hasItems) {
+            var list = document.createElement("ul");
+            list.style.margin = "4px 0 0";
+            list.style.paddingLeft = "18px";
+            list.style.fontSize = "12px";
+
+            items.forEach(function (item) {
+              var li = document.createElement("li");
+              li.textContent = item;
+              list.appendChild(li);
+            });
+
+            sectionEl.appendChild(list);
+          } else {
+            var empty = document.createElement("div");
+            empty.style.marginTop = "4px";
+            empty.style.fontSize = "12px";
+            empty.style.color = "var(--color-text-muted)";
+            empty.textContent = "No " + section.label.toLowerCase() + " captured.";
+            sectionEl.appendChild(empty);
+          }
+
+          summaryEl.appendChild(sectionEl);
+        });
+      }
+
+      function setLoading(isLoading) {
+        var generateBtn = document.getElementById("generateBtn");
+        var statusSpinner = document.getElementById("statusSpinner");
+        var btnLabel = document.getElementById("generateBtn-label");
+        var allInputs = document.querySelectorAll(
+          'textarea, input[type="text"]'
+        );
+
+        if (isLoading) {
+          if (generateBtn) {
+            generateBtn.disabled = true;
+            generateBtn.classList.add("is-loading");
+          }
+          if (btnLabel) {
+            btnLabel.textContent = "Generating...";
+          }
+          if (statusSpinner) {
+            statusSpinner.classList.add("visible");
+          }
+          allInputs.forEach(function (el) {
+            el.disabled = true;
+          });
+        } else {
+          if (generateBtn) {
+            generateBtn.disabled = false;
+            generateBtn.classList.remove("is-loading");
+          }
+          if (btnLabel) {
+            btnLabel.textContent = "Generate Debate";
+          }
+          if (statusSpinner) {
+            statusSpinner.classList.remove("visible");
+          }
+          allInputs.forEach(function (el) {
+            el.disabled = false;
+          });
+        }
+      }
+
+      function loadDebates() {
+        try {
+          var raw = window.localStorage.getItem("personaDebates");
+          if (!raw) {
+            return [];
+          }
+          var parsed = JSON.parse(raw);
+          if (!Array.isArray(parsed)) {
+            console.warn("PersonaDebate loadDebates: parsed value is not an array", {
+              parsed: parsed,
+            });
+            return [];
+          }
+          return parsed;
+        } catch (err) {
+          console.error("PersonaDebate loadDebates: failed to read from localStorage", {
+            error: err,
+          });
+          try {
+            window.localStorage.removeItem("personaDebates");
+          } catch (clearErr) {
+            console.error(
+              "PersonaDebate loadDebates: failed to clear corrupt localStorage",
+              { error: clearErr }
+            );
+          }
+          return [];
+        }
+      }
+
+      function saveDebate(productIdea, personas, debateData) {
+        var debate = {
+          id: Date.now(),
+          timestamp: new Date().toISOString(),
+          productIdea: productIdea,
+          personas: personas,
+          debateData: debateData,
+        };
+
+        try {
+          var existing = loadDebates();
+          existing.unshift(debate);
+
+          var maxRuns =
+            CONFIG && typeof CONFIG.MAX_SAVED_RUNS === "number"
+              ? CONFIG.MAX_SAVED_RUNS
+              : 20;
+
+          if (maxRuns > 0 && existing.length > maxRuns) {
+            existing = existing.slice(0, maxRuns);
+          }
+
+          window.localStorage.setItem(
+            "personaDebates",
+            JSON.stringify(existing)
+          );
+        } catch (err) {
+          console.error("PersonaDebate saveDebate: failed to persist to localStorage", {
+            error: err,
+            productIdeaPreview: (productIdea || "").slice(0, 80),
+          });
+          showError(
+            "Debate shown, but history could not be saved.",
+            err && err.message ? err.message : err
+          );
+        }
+
+        try {
+          refreshHistory();
+        } catch (refreshErr) {
+          console.error("PersonaDebate saveDebate: refreshHistory failed", {
+            error: refreshErr,
+          });
+        }
+      }
+
+      function refreshHistory() {
+        var historyEl = document.getElementById("history");
+        if (!historyEl) {
+          console.error("PersonaDebate refreshHistory: #history element not found");
+          return;
+        }
+
+        historyEl.innerHTML = "";
+
+        var debates = loadDebates();
+
+        if (!debates.length) {
+          historyEl.classList.add("empty");
+          historyEl.textContent = "No saved debates yet.";
+          return;
+        }
+
+        historyEl.classList.remove("empty");
+
+        debates.forEach(function (debate, index) {
+          var item = document.createElement("button");
+          item.type = "button";
+          item.className = "history-item";
+
+          var ideaPreview = (debate.productIdea || "").slice(0, 50);
+          if (debate.productIdea && debate.productIdea.length > 50) {
+            ideaPreview += "…";
+          }
+
+          var when = "";
+          try {
+            when = new Date(debate.timestamp).toLocaleString();
+          } catch (_) {
+            when = debate.timestamp || "";
+          }
+
+          var header = document.createElement("div");
+          header.className = "history-item-header";
+
+          var ideaSpan = document.createElement("span");
+          ideaSpan.className = "history-item-idea";
+          ideaSpan.textContent = ideaPreview;
+
+          var metaSpan = document.createElement("span");
+          metaSpan.className = "history-item-meta";
+          metaSpan.textContent = when;
+
+          header.appendChild(ideaSpan);
+          header.appendChild(metaSpan);
+
+          item.appendChild(header);
+
+          if (index === 0) {
+            var badge = document.createElement("span");
+            badge.className = "history-badge-new";
+            badge.textContent = "new";
+            item.appendChild(badge);
+          }
+
+          item.addEventListener("click", function () {
+            loadSavedDebate(debate);
+          });
+
+          historyEl.appendChild(item);
+        });
+      }
+
+      function loadSavedDebate(debate) {
+        if (!debate) {
+          return;
+        }
+
+        var ideaEl = document.getElementById("idea");
+        if (ideaEl) {
+          ideaEl.value = debate.productIdea || "";
+        }
+
+        var cards = document.querySelectorAll(".persona-card");
+        if (cards && cards.length) {
+          cards.forEach(function (card, index) {
+            var persona = (debate.personas || [])[index];
+            if (!persona) {
+              return;
+            }
+            var nameInput = card.querySelector(".persona-name-input");
+            var perspectiveInput = card.querySelector(".persona-perspective");
+            if (nameInput) {
+              nameInput.value = persona.name || "";
+            }
+            if (perspectiveInput) {
+              perspectiveInput.value = persona.perspective || "";
+            }
+          });
+        }
+
+        try {
+          displayDebate(debate.debateData);
+        } catch (err) {
+          console.error("PersonaDebate loadSavedDebate: failed to display debate", {
+            error: err,
+            debate: debate,
+          });
+        }
+
+        updateStatus("Loaded saved debate", "success");
+      }
+
+      async function generateDebate() {
+        var state = collectFormState();
+        var idea = state.idea;
+        var personas = state.personas;
+
+        console.log("PersonaDebate generateDebate: collected form state", {
+          ideaLength: idea.length,
+          personas: personas,
+        });
+
+        if (!idea) {
+          showError("Please describe your product idea first.", null);
+          return;
+        }
+
+        if (idea.length > 5000) {
+          var originalLength = idea.length;
+          idea = idea.slice(0, 5000);
+          console.warn("PersonaDebate: truncating idea to 5000 characters", {
+            originalLength: originalLength,
+          });
+          updateStatus("Idea truncated to 5000 characters for reliability.", "error");
+        }
+
+        var missingName = personas.find(function (p) {
+          return !p.name;
+        });
+
+        if (missingName) {
+          showError("Please fill in all persona names.", null);
+          return;
+        }
+
+        if (!CONFIG_KEYS || !CONFIG_KEYS.OPENAI_API_KEY) {
+          console.error("PersonaDebate: Missing CONFIG_KEYS.OPENAI_API_KEY", {
+            hasConfigKeys: !!CONFIG_KEYS,
+          });
+          showError("API key not set – update config-keys.js", null);
+          return;
+        }
+
+        var prompt = buildDebatePrompt(idea, personas);
+
+        setLoading(true);
+        updateStatus("Generating debate...", "loading");
+
+        var endpoint = CONFIG && CONFIG.OPENAI_ENDPOINT
+          ? CONFIG.OPENAI_ENDPOINT
+          : "https://api.openai.com/v1/responses";
+        var model = CONFIG && CONFIG.OPENAI_MODEL ? CONFIG.OPENAI_MODEL : "gpt-4.1-mini";
+
+        console.log("PersonaDebate generateDebate: about to call OpenAI", {
+          endpoint: endpoint,
+          model: model,
+          ideaPreview: idea.slice(0, 120),
+          personasCount: personas.length,
+        });
+
+        var rawResponseText = null;
+        var parsedData = null;
+
+        try {
+          var response = await fetch(endpoint, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: "Bearer " + CONFIG_KEYS.OPENAI_API_KEY,
+            },
+            body: JSON.stringify({
+              model: model,
+              input: prompt,
+            }),
+          });
+
+          console.log("PersonaDebate generateDebate: fetch completed", {
+            ok: response.ok,
+            status: response.status,
+            statusText: response.statusText,
+          });
+
+          if (!response.ok) {
+            var errorBody = "";
+            try {
+              errorBody = await response.text();
+            } catch (readErr) {
+              console.error(
+                "PersonaDebate HTTP error: failed to read error body",
+                readErr
+              );
+            }
+
+            console.error("PersonaDebate HTTP error response", {
+              status: response.status,
+              statusText: response.statusText,
+              body: errorBody,
+              endpoint: endpoint,
+              model: model,
+            });
+
+            if (response.status === 401) {
+              showError(
+                "Invalid API key - check your config-keys.js file",
+                errorBody || response.statusText
+              );
+            } else if (response.status === 429) {
+              showError(
+                "Rate limited - wait a minute and try again",
+                errorBody || response.statusText
+              );
+            } else if (response.status >= 500) {
+              showError(
+                "OpenAI service error - try again in a few minutes",
+                errorBody || response.statusText
+              );
+            } else {
+              showError(
+                "Request failed with status " + response.status,
+                errorBody || response.statusText
+              );
+            }
+            return;
+          }
+
+          try {
+            rawResponseText = await response.text();
+          } catch (readOkErr) {
+            showError("Unexpected response format", readOkErr);
+            return;
+          }
+
+          try {
+            parsedData = rawResponseText ? JSON.parse(rawResponseText) : null;
+          } catch (parseErr) {
+            showError("Unexpected response format", rawResponseText);
+            console.error("PersonaDebate JSON parse error", {
+              error: parseErr,
+              raw: rawResponseText && rawResponseText.slice(0, 1000),
+            });
+            return;
+          }
+
+          console.log("PersonaDebate generateDebate: parsed JSON response", {
+            keys: parsedData && typeof parsedData === "object"
+              ? Object.keys(parsedData)
+              : [],
+          });
+
+          var clean = { messages: [], summary: { tensions: [], objections: [], insights: [] } };
+
+          if (parsedData && Array.isArray(parsedData.messages)) {
+            clean.messages = parsedData.messages;
+          }
+
+          if (parsedData && parsedData.summary && typeof parsedData.summary === "object") {
+            clean.summary = parsedData.summary;
+          }
+
+          if (!clean.messages.length && (!parsedData || !Array.isArray(parsedData.messages))) {
+            showError("Unexpected response format", rawResponseText);
+            return;
+          }
+
+          if (
+            (!parsedData || !Array.isArray(parsedData.messages)) ||
+            !parsedData.summary ||
+            typeof parsedData.summary !== "object"
+          ) {
+            showError(
+              "Unexpected response format - showing partial results.",
+              parsedData
+            );
+          }
+
+          displayDebate(clean);
+          saveDebate(idea, personas, clean);
+          updateStatus("Debate generated!", "success");
+        } catch (err) {
+          console.error("PersonaDebate network/parse error", {
+            error: err,
+            endpoint: endpoint,
+            model: model,
+            ideaPreview: idea.slice(0, 120),
+            personas: personas,
+          });
+
+          if (err && err.name === "TypeError") {
+            showError(
+              "Network error - check your internet connection",
+              err && err.message ? err.message : err
+            );
+          } else {
+            showError("Unexpected response format", rawResponseText || err);
+          }
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function () {
+        var generateBtn = document.getElementById("generateBtn");
+        var clearHistoryBtn = document.getElementById("clearHistoryBtn");
+        var resetAppBtn = document.getElementById("resetAppBtn");
+        var retryBtn = document.getElementById("retryBtn");
+        var ideaEl = document.getElementById("idea");
+        var ideaCounter = document.getElementById("ideaCounter");
+
+        if (typeof CONFIG !== "undefined" && CONFIG.OPENAI_MODEL) {
+          var label = document.getElementById("model-label");
+          if (label) {
+            label.textContent = CONFIG.OPENAI_MODEL;
+          }
+        }
+
+        if (generateBtn) {
+          generateBtn.addEventListener("click", function () {
+            console.log("PersonaDebate: Generate button clicked");
+            generateDebate();
+          });
+        }
+
+        if (retryBtn) {
+          retryBtn.addEventListener("click", function () {
+            console.log("PersonaDebate: Retry button clicked");
+            retryBtn.classList.add("hidden");
+            generateDebate();
+          });
+        }
+
+        if (ideaEl && ideaCounter) {
+          var updateCounterAndSize = function () {
+            var value = ideaEl.value || "";
+            ideaCounter.textContent = value.length + " characters";
+            ideaEl.style.height = "auto";
+            var maxHeight = 220;
+            var newHeight = Math.min(ideaEl.scrollHeight, maxHeight);
+            ideaEl.style.height = newHeight + "px";
+          };
+
+          ideaEl.addEventListener("input", updateCounterAndSize);
+          updateCounterAndSize();
+        }
+
+        document.addEventListener("keydown", function (event) {
+          if (
+            (event.metaKey || event.ctrlKey) &&
+            event.key === "Enter" &&
+            !event.shiftKey
+          ) {
+            var active = document.activeElement;
+            if (
+              active &&
+              (active.tagName === "TEXTAREA" || active.tagName === "INPUT")
+            ) {
+              event.preventDefault();
+              if (!document.getElementById("generateBtn").disabled) {
+                console.log("PersonaDebate: Keyboard shortcut Cmd/Ctrl+Enter");
+                generateDebate();
+              }
+            }
+          }
+        });
+
+        if (clearHistoryBtn) {
+          clearHistoryBtn.addEventListener("click", function () {
+            var confirmed = window.confirm(
+              "Clear all saved debates from this browser?"
+            );
+            if (!confirmed) {
+              return;
+            }
+
+            try {
+              window.localStorage.removeItem("personaDebates");
+            } catch (err) {
+              console.error(
+                "PersonaDebate clearHistory: failed to remove from localStorage",
+                { error: err }
+              );
+            }
+
+            try {
+              refreshHistory();
+            } catch (refreshErr) {
+              console.error(
+                "PersonaDebate clearHistory: refreshHistory failed",
+                { error: refreshErr }
+              );
+            }
+
+            updateStatus("History cleared", "success");
+          });
+        }
+
+        if (resetAppBtn) {
+          resetAppBtn.addEventListener("click", function () {
+            var confirmed = window.confirm(
+              "Reset Persona Debate? This will clear all saved data for this app and reload."
+            );
+            if (!confirmed) {
+              return;
+            }
+
+            try {
+              window.localStorage.clear();
+            } catch (err) {
+              showError(
+                "Failed to fully reset app storage.",
+                err && err.message ? err.message : err
+              );
+            }
+
+            window.location.reload();
+          });
+        }
+
+        updateStatus("Ready", "ready");
+        refreshHistory();
+      });
+    </script>
+  </body>
+  </html>
+
